@@ -11,7 +11,7 @@ plugins {
 
 ext {
     appName = System.getenv("NEW_APP_NAME") ?:"skywin"
-    hostName = "ssapp0.com"
+    hostName = System.getenv("NEW_HOST_NAME") ?:"ssapp0.com"
     proxyHost = "34.92.220.7"
     proxyPort = 3129
     proxyUserName = "guest"
