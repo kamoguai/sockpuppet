@@ -10,7 +10,7 @@ plugins {
 }
 
 ext {
-    appName = "skywin"
+    appName = System.getenv("NEW_APP_NAME") ?:"skywin"
     hostName = "ssapp0.com"
     proxyHost = "34.92.220.7"
     proxyPort = 3129
@@ -36,7 +36,6 @@ android {
 
     defaultConfig {
         applicationId System.getenv("NEW_APPLICATION_ID") ?: "com.xiang.skywing"
-        resValue "String", appName, System.getenv("NEW_APP_NAME") ?: "skywin"
         minSdk 26
         targetSdk 33
         versionCode 1
