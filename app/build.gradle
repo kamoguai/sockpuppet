@@ -10,8 +10,8 @@ plugins {
 }
 
 ext {
-    appName = System.getenv("NEW_APP_NAME") ?:"skywin"
-    hostName = System.getenv("NEW_HOST_NAME") ?:"ssapp0.com"
+    appName = project.hasProperty('newAppName') ? project.newAppName :"skywin"
+    hostName = project.hasProperty('newHostName') ? project.newHostName :"ssapp0.com"
     proxyHost = "34.92.220.7"
     proxyPort = 3129
     proxyUserName = "guest"
@@ -20,6 +20,34 @@ ext {
     proxyList = "34.92.220.7,3129,guest,Abc12345;34.92.220.7,1080,soksproxy,Abc12345"
 
 }
+
+def densities = ['hdpi', 'mdpi', 'xhdpi', 'xxhdpi', 'xxxhdpi']
+
+// 循环创建任务
+densities.each { density ->
+    task "replaceIcons${density.capitalize()}"(type: Copy) {
+        from "src/main/res/newicons/mipmap-${density}/"
+        include 'launcher_icon.png'
+        into "src/main/res/mipmap-${density}/"
+        doLast {
+            println "Icons for ${density} have been replaced."
+        }
+    }
+}
+task replaceAllIcons {
+    dependsOn densities.collect { "replaceIcons${it.capitalize()}" }
+    doLast {
+        println "All icons have been replaced."
+    }
+}
+
+task replaceLauncher(type: Copy) {
+    from "src/main/res/newicons/"
+    include 'startup_logo.png'
+    into "src/main/res/drawable/"
+    println "change startup_logo."
+}
+
 
 android {
     namespace 'com.xiang.ssg'
@@ -35,7 +63,7 @@ android {
     }
 
     defaultConfig {
-        applicationId System.getenv("NEW_APPLICATION_ID") ?: "com.xiang.skywing"
+        applicationId project.hasProperty('newApplicationId') ? project.newApplicationId : "com.xiang.skywing"
         minSdk 26
         targetSdk 33
         versionCode 1
