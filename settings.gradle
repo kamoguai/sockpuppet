@@ -1,16 +1,19 @@
-pluginManagement {
+pluginManagement {//新版 plugin  repo 從 root project 的 buildscript 的 repositories 移動到此
     repositories {
-        google()
-        mavenCentral()
         gradlePluginPortal()
+        google()
+        mavenCentral()
+        maven {url "https://s01.oss.sonatype.org/content/groups/public"}
+        maven {url "https://s01.oss.sonatype.org/content/repositories/releases"}
     }
 }
-dependencyResolutionManagement {
-    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+dependencyResolutionManagement {//新版  lib  repo 從 root project 的 allprojects 內的 repositories 移動到此
     repositories {
         google()
         mavenCentral()
+        maven {url "https://s01.oss.sonatype.org/content/groups/public"}
+        maven {url "https://s01.oss.sonatype.org/content/repositories/releases"}
     }
 }
-rootProject.name = "66063-SSGaming"
+rootProject.name = "212-XOC88"
 include ':app'

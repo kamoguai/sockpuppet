@@ -21,30 +21,61 @@ platform :android do
     gradle(task: "test")
   end
 
+  desc "Replace Drawer Icon and App Icon"
+  lane :replace_icons do |options|
+    drawer_icon_path = options[:drawer_icon] || "./path/to/default/drawer_icon.png"
+    icons_base_path = options[:app_icons] || "./path/to/icons/"
+
+    # 替換抽屜圖像
+    drawer_path =  File.join(drawer_icon_path,"","startup_logo.png")
+    if File.exist?(drawer_path)
+      sh "cp #{drawer_path} ../app/src/main/res/drawable/startup_logo.png"
+    else
+        UI.user_error!("Missing drawable path:  #{drawer_path}")
+    end
+
+    # 替換應用程序圖標
+    ["mdpi", "hdpi", "xhdpi", "xxhdpi", "xxxhdpi"].each do |density|
+      source_icon_path = File.join(icons_base_path, density, "ic_launcher.png")
+      target_icon_path = "../app/src/main/res/mipmap-#{density}/launcher_icon.png"
+
+      if File.exist?(source_icon_path)
+        sh "cp #{source_icon_path} #{target_icon_path}"
+      else
+        UI.user_error!("Missing icon for density: #{density} at path: #{source_icon_path}")
+      end
+    end
+
+    # 生成新的 APK 文件
+    gradle(
+      task: "test"
+    )
+  end
+
   desc "Submit a new Beta Build to Crashlytics Beta"
-  lane :beta do
-    gradle(task: "clean assembleRelease")
-    crashlytics
+  lane :beta do |options|
+    appId = options[:appId] || "com.xiang.gold"
+    appName = options[:appName] || "GOLD"
+    stage = options[:stage] || "66179"
+    hostName = options[:hostName] || "apprunninglink.com?deviceType=app"
+
+    puts "開始打包....!!!@@@@"
+    puts "appId: #{appId}"
+    puts "appName: #{appName}"
+    puts "stage: #{stage}"
+    puts "hostName: #{hostName}"
+    gradle(task:'clean')
+    gradle(task: "assembleRelease",
+      properties: {
+              "APPID" => appId,
+              "APP_NAME" => appName,
+              "HOST_NAME" => hostName,
+              "STAGE" => stage
+            }
+    )
+    puts "打包完成....!!!@@@@"
 
     # sh "your_script.sh"
     # You can also use other beta testing services here
-  end
-
-  desc "Deploy a new version to the Google Play"
-  lane :deploy do
-    gradle(task: "clean assembleRelease")
-    upload_to_play_store
-  end
-
-  desc "Build android app"
-  lane :build_android do |options|
-    gradle(task: "replaceLauncher",
-      properties: {
-          'newApplicationId': options[:newApplicationId],
-          'newHostName': options[:newHostName],
-          'newAppName': options[:newAppName],
-      }
-    )
-    # sh "./gradlew replaceIcons"
   end
 end

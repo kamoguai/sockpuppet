@@ -31,23 +31,14 @@
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/launcher_icon"
-        android:label="${appName}"
         android:roundIcon="@mipmap/launcher_icon"
+        android:label="${appName}"
         android:supportsRtl="true"
         android:theme="@style/Theme.TemplateWeb"
         android:hardwareAccelerated="true"
-        android:usesCleartextTraffic="true"
-        android:requestLegacyExternalStorage="true"
         tools:targetApi="31">
 
         <meta-data android:name="templateweb.hostname"  android:value="${hostName}" />
-        <meta-data android:name="templateweb.proxyHost"  android:value="${proxyHost}" />
-        <meta-data android:name="templateweb.proxyPort"  android:value="${proxyPort}" />
-        <meta-data android:name="templateweb.proxyUserName"  android:value="${proxyUserName}" />
-        <meta-data android:name="templateweb.proxyPassword"  android:value="${proxyPassword}" />
-        <meta-data android:name="templateweb.proxyList"  android:value="${proxyList}" />
-
-        <meta-data android:name="com.openinstall.APP_KEY" android:value="p0e2ai"/>
 
         <activity
             android:name=".MainActivity"

@@ -1,57 +1,56 @@
 plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
+//    id 'com.google.gms.google-services'
 
-    id 'kotlin-parcelize'
-    id 'androidx.navigation.safeargs.kotlin'
-    id 'com.google.dagger.hilt.android'
-    id 'com.google.devtools.ksp'
-    id 'kotlin-kapt'
+//    id 'kotlin-parcelize'
+//    id 'androidx.navigation.safeargs.kotlin'
+//    id 'com.google.dagger.hilt.android'
+//    id 'com.google.devtools.ksp'
+//    id 'kotlin-kapt'
 }
 
 ext {
-    appName = project.hasProperty('newAppName') ? project.newAppName :"skywin"
-    hostName = project.hasProperty('newHostName') ? project.newHostName :"ssapp0.com"
-    proxyHost = "34.92.220.7"
-    proxyPort = 3129
-    proxyUserName = "guest"
-    proxyPassword = "Abc12345"
-    ///用字串去串array以;為split對象
-    proxyList = "34.92.220.7,3129,guest,Abc12345;34.92.220.7,1080,soksproxy,Abc12345"
-
+    appName = project.hasProperty("APP_NAME") ? project.APP_NAME : "GOLD"
+    hostName = project.hasProperty("HOST_NAME") ? project.HOST_NAME : "apprunninglink.com?deviceType=app"
+    stage =  project.hasProperty("STAGE") ? project.STAGE : "66179"
+    appId = project.hasProperty("APPID") ? project.APPID : "com.xiang.gold"
+    appIcon = "@mipmap/ic_launcher"
 }
-
-def densities = ['hdpi', 'mdpi', 'xhdpi', 'xxhdpi', 'xxxhdpi']
-
-// 循环创建任务
-densities.each { density ->
-    task "replaceIcons${density.capitalize()}"(type: Copy) {
-        from "src/main/res/newicons/mipmap-${density}/"
-        include 'launcher_icon.png'
-        into "src/main/res/mipmap-${density}/"
-        doLast {
-            println "Icons for ${density} have been replaced."
-        }
-    }
-}
-task replaceAllIcons {
-    dependsOn densities.collect { "replaceIcons${it.capitalize()}" }
-    doLast {
-        println "All icons have been replaced."
-    }
-}
-
-task replaceLauncher(type: Copy) {
-    from "src/main/res/newicons/"
-    include 'startup_logo.png'
-    into "src/main/res/drawable/"
-    println "change startup_logo."
-}
-
 
 android {
-    namespace 'com.xiang.ssg'
-    compileSdk 33
+    namespace 'com.xiang.templateweb'
+    compileSdk 34
+
+    buildFeatures {
+//Ref : https://developer.android.com/reference/tools/gradle-api/7.4/com/android/build/api/dsl/BuildFeatures
+        compose true
+        buildConfig = true
+    }
+
+    defaultConfig {
+        applicationId "$appId"
+        minSdk 26
+        targetSdk 34
+        versionCode 1
+        versionName "1.0.1"
+        ///google auth token
+        buildConfigField "String", "GOOGLE_AUTH_CLIENT_ID", "\"788439560266-hh2qfrg0j99atovbkc6nmq41b2pgjf0a.apps.googleusercontent.com\""
+        buildConfigField "String", "APP_NAME","\"$appName\""
+        buildConfigField "String", "STAGE", "\"$stage\""
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        vectorDrawables {
+            useSupportLibrary true
+        }
+
+        manifestPlaceholders = [//Ref : https://developer.android.com/build/manage-manifests  & https://blog.sentry.io/android-manifest-placeholders/
+                                appName : "$appName",
+                                hostName: "https://$hostName",
+//                                 hostName:"file:///android_asset/my_page.html",
+                                appIcon : appIcon,
+        ]
+
+    }
 
     signingConfigs {
         readom {
@@ -59,39 +58,6 @@ android {
             keyAlias 'AppAkyAlias'
             storePassword 'gfgg8b4196f'
             keyPassword 'b8g64f4bw'
-        }
-    }
-
-    defaultConfig {
-        applicationId project.hasProperty('newApplicationId') ? project.newApplicationId : "com.xiang.skywing"
-        minSdk 26
-        targetSdk 33
-        versionCode 1
-        versionName "1.0.0"
-
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-        vectorDrawables {
-            useSupportLibrary true
-        }
-
-        manifestPlaceholders = [
-                appName : "$appName",
-                hostName : "https://$hostName",
-                proxyHost : "$proxyHost",
-                proxyPort : proxyPort,
-                proxyUserName : "$proxyUserName",
-                proxyPassword : "$proxyPassword",
-                proxyList : "$proxyList",
-        ]
-    }
-
-    applicationVariants.all { variant ->
-        variant.outputs.all { output ->
-            if (outputFileName.endsWith('.apk')) {
-                def timeStamp = new Date().format('yyyyMMdd')
-                def newHostString = hostName.replace('?', '_')
-                outputFileName = "${appName}_${newHostString}_${timeStamp}.apk"
-            }
         }
     }
 
@@ -105,149 +71,205 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+
+    applicationVariants.all { variant ->
+//        kotlin.sourceSets { //KAPT or KSP  generate code Ref : https://medium.com/google-developer-experts/ksp-for-code-generation-dfd2073a6635 & https://thawzintoe.medium.com/unlocking-the-art-a-guide-to-generating-code-with-kotlin-symbol-processor-26eb5760cd4b & https://kotlinlang.org/docs/ksp-quickstart.html
+//            getByName(variant.name) {
+//                kotlin.srcDir("build/generated/ksp/${variant.name}/kotlin")
+//            }
+//        }
+        variant.outputs.all { output ->
+            if (outputFileName.endsWith('.apk')) {
+                def timeStamp = new Date().format('yyyyMMdd')
+                def newHostString = hostName.replaceAll("[:?/]", '_')
+                def str = newHostString
+                if (newHostString.length() > 40) {
+                    str = newHostString.substring(0, 14)
+                }
+                outputFileName = "${appName}_${str}_${timeStamp}.apk"
+            }
+        }
+    }
+
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_17
         targetCompatibility JavaVersion.VERSION_17
     }
+
     kotlinOptions {
         jvmTarget = '17'
     }
-    buildFeatures {
-        compose true
-        buildConfig = true
-    }
+
     composeOptions {
         kotlinCompilerExtensionVersion compose_compiler_version
     }
-    hilt {
-        enableAggregatingTask = true
-    }
-
-    applicationVariants.all { variant ->
-        kotlin.sourceSets {
-            getByName(variant.name) {
-                kotlin.srcDir("build/generated/ksp/${variant.name}/kotlin")
-            }
-        }
-    }
+//    hilt {
+//        enableAggregatingTask = true
+//    }
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    //region jetbrains
+    //region  kotlin
+    //endregion
+//    //region serializatio
+//    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1")
+//    //endregion
+    //endregion
 
-    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.0.3'
+    //region legacy
+    implementation 'androidx.core:core-ktx:1.10.1'
 
+
+//    // Android Constraintlayout
+//    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+//
     // splashscreen
     implementation 'androidx.core:core-splashscreen:1.0.1'
+    //endregion
 
-    implementation 'androidx.core:core-ktx:1.10.1'
-    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.6.1'
+    //region compose
     implementation 'androidx.activity:activity-compose:1.7.2'
-    testImplementation 'junit:junit:4.13.2'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
-
-    // Android Constraintlayout
-    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
-    implementation 'androidx.constraintlayout:constraintlayout-compose:1.0.1'
-
     // Compose
     implementation "androidx.compose.ui:ui:$compose_version"
     implementation "androidx.compose.runtime:runtime-livedata:$compose_version"
-    implementation "androidx.compose.material:material:$compose_version"
+//    implementation "androidx.compose.material:material:$compose_version"
     implementation "androidx.compose.ui:ui-tooling-preview:$compose_version"
-    implementation "androidx.compose.animation:animation:$compose_version"
-    implementation "androidx.compose.animation:animation-core:$compose_version"
-    implementation "androidx.compose.material:material-icons-extended:$compose_version"
-    implementation "androidx.compose.foundation:foundation-layout:$compose_version"
+//    implementation "androidx.compose.animation:animation:$compose_version"
+//    implementation "androidx.compose.animation:animation-core:$compose_version"
+//    implementation "androidx.compose.material:material-icons-extended:$compose_version"
+//    implementation "androidx.compose.foundation:foundation-layout:$compose_version"
+    // Compose material3
+    implementation "androidx.compose.material3:material3:1.1.0"
+//    implementation "androidx.compose.material3:material3-window-size-class:1.1.0"
+//    // Android Compose Constraintlayout
+//    implementation 'androidx.constraintlayout:constraintlayout-compose:1.0.1'
+
+//    // Compose Accompanist https://mvnrepository.com/artifact/com.google.accompanist
+    def compose_accompanist = "0.34.0"
+//    implementation "com.google.accompanist:accompanist-navigation-animation:$compose_accompanist"
+//    implementation "com.google.accompanist:accompanist-pager:$compose_accompanist"
+//    implementation "com.google.accompanist:accompanist-systemuicontroller:$compose_accompanist"
+    implementation "com.google.accompanist:accompanist-webview:$compose_accompanist"
+
+    // 權限 https://google.github.io/accompanist/permissions/
+    implementation "com.google.accompanist:accompanist-permissions:$compose_accompanist"
+    //endregion
+
+
+//    //region Lifecycle
+//    //region common
+//    def lifecycleVersion = "2.5.1"
+//    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.6.1'
+//    implementation "androidx.lifecycle:lifecycle-process:$lifecycleVersion"
+//    implementation "androidx.lifecycle:lifecycle-runtime-ktx:$lifecycleVersion"
+//    implementation("androidx.lifecycle:lifecycle-livedata-ktx:$lifecycleVersion")
+//    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycleVersion")
+//    implementation("androidx.lifecycle:lifecycle-viewmodel-savedstate:$lifecycleVersion")
+//    //    ksp "androidx.lifecycle:lifecycle-common-java8:$lifecycleVersion"
+//    //endregion
+//    //region compose
+//    implementation "com.google.android.material:compose-theme-adapter:1.2.1"
+//    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:$lifecycleVersion")
+//    //endregion
+//    //endregion
+//    //region Paging
+//    //region compose
+//    implementation 'androidx.paging:paging-compose:1.0.0-alpha19'
+//    //endregion
+//    //endregion
+    //region WebView & webkit
+    implementation "androidx.webkit:webkit:1.6.1"
+    //endregion
+//    //region desugar
+//    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.0.3'
+//    //endregion
+//    //region Image
+//    // Coil Compose
+//    implementation "io.coil-kt:coil-compose:2.3.0"
+//    //endregion
+//    //region  DI
+//    //region Hilt
+////    implementation "androidx.hilt:hilt-navigation-compose:1.0.0"
+////    implementation "com.google.dagger:hilt-android:2.44"
+////    kapt "com.google.dagger:hilt-android-compiler:2.44"
+////    ksp 'androidx.hilt:hilt-compiler:1.0.0'
+//    //endregion
+//    //region koin
+//    //endregion
+//    //endregion
+    // Logging Timber
+    implementation "com.jakewharton.timber:timber:5.0.1"
+//
+//    //region Navigation
+//    // Navigation Destinations
+//    def compose_destinations_version = "1.8.41-beta"
+//    implementation "io.github.raamcosta.compose-destinations:animations-core:$compose_destinations_version"
+////    ksp "io.github.raamcosta.compose-destinations:ksp:$compose_destinations_version"
+//    //endregion
+//
+//
+//    //region Json
+//    // moshi
+//    implementation "com.squareup.moshi:moshi-kotlin:1.13.0"
+////    ksp 'com.squareup.moshi:moshi-kotlin-codegen:1.13.0'
+//
+//    // gson
+    implementation 'com.google.code.gson:gson:2.10.1'
+//    //endregion
+//
+//
+//    //region Storage
+//    // DB Room
+//    def roomVersion = "2.5.1"
+//    implementation "androidx.room:room-runtime:$roomVersion"
+//    implementation "androidx.room:room-ktx:$roomVersion"
+//    implementation "androidx.room:room-paging:$roomVersion"
+////    ksp "androidx.room:room-compiler:$roomVersion"
+//
+//    // DataStore
+//    implementation("androidx.datastore:datastore:1.0.0")
+//    implementation("androidx.datastore:datastore-preferences:1.0.0")
+//    //endregion
+//
+////region Network client
+//    // okhttp
+//    def okhttpVersion = "4.9.1"
+    implementation "com.squareup.okhttp3:okhttp:${libs.versions.okhttp.get()}"
+    implementation "com.squareup.okhttp3:logging-interceptor:${libs.versions.okhttp.get()}"
+    implementation "com.squareup.okhttp3:okhttp-dnsoverhttps:${libs.versions.okhttp.get()}"
+//
+//    // retrofit2
+//    implementation 'com.squareup.retrofit2:retrofit:2.9.0'
+//    //retrofit2 標準轉換器
+//    implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
+//    implementation 'com.squareup.retrofit2:converter-moshi:2.9.0'
+//    implementation 'com.squareup.retrofit2:converter-scalars:2.9.0'
+//    //endregion
+
+    //region xcrash
+    implementation 'com.iqiyi.xcrash:xcrash-android-lib:3.1.0'
+    //endregion
+
+    //region google firebase
+    implementation(platform("com.google.firebase:firebase-bom:32.8.0"))
+    implementation("com.google.firebase:firebase-auth")
+    implementation "com.google.android.gms:play-services-auth:20.7.0"
+    //google auth
+    implementation "androidx.credentials:credentials:1.3.0-alpha01"
+    implementation "androidx.credentials:credentials-play-services-auth:1.2.2"
+    implementation "com.google.android.libraries.identity.googleid:googleid:1.1.0"
+    implementation 'com.firebaseui:firebase-ui-auth:7.2.0'
+    //region google firebase
+
+    //region test & android test
+    testImplementation 'junit:junit:4.13.2'
     debugImplementation "androidx.compose.ui:ui-tooling:$compose_version"
     debugImplementation "androidx.compose.ui:ui-test-manifest:$compose_version"
     androidTestImplementation "androidx.compose.ui:ui-test-junit4:$compose_version"
+    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
 
-    // Compose Accompanist
-    def compose_accompanist = "0.30.1"
-    implementation "com.google.accompanist:accompanist-navigation-animation:$compose_accompanist"
-    implementation "com.google.accompanist:accompanist-pager:$compose_accompanist"
-    implementation "com.google.accompanist:accompanist-systemuicontroller:$compose_accompanist"
-    implementation "com.google.accompanist:accompanist-webview:$compose_accompanist"
-    implementation "com.google.accompanist:accompanist-systemuicontroller:$compose_accompanist"
 
-    // 權限
-    implementation "com.google.accompanist:accompanist-permissions:$compose_accompanist"
-
-    // material3
-    implementation "androidx.compose.material3:material3:1.1.0"
-    implementation "androidx.compose.material3:material3-window-size-class:1.1.0"
-
-    // Lifecycle
-    def lifecycleVersion = "2.5.1"
-    implementation "com.google.android.material:compose-theme-adapter:1.2.1"
-    implementation "androidx.lifecycle:lifecycle-process:$lifecycleVersion"
-    implementation "androidx.lifecycle:lifecycle-runtime-ktx:$lifecycleVersion"
-    implementation("androidx.lifecycle:lifecycle-livedata-ktx:$lifecycleVersion")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycleVersion")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-savedstate:$lifecycleVersion")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:$lifecycleVersion")
-    ksp "androidx.lifecycle:lifecycle-common-java8:$lifecycleVersion"
-
-    // Paging 3.0
-    implementation 'androidx.paging:paging-compose:1.0.0-alpha19'
-
-    // Coil Compose
-    implementation "io.coil-kt:coil-compose:2.3.0"
-
-    // Hilt
-    implementation "androidx.hilt:hilt-navigation-compose:1.0.0"
-    implementation "com.google.dagger:hilt-android:2.44"
-    kapt "com.google.dagger:hilt-android-compiler:2.44"
-
-    // Hilt 集成 jetpack
-    ksp 'androidx.hilt:hilt-compiler:1.0.0'
-
-    // Logging Timber
-    implementation "com.jakewharton.timber:timber:5.0.1"
-
-    // Navigation Destinations
-    def compose_destinations_version = "1.8.41-beta"
-    implementation "io.github.raamcosta.compose-destinations:animations-core:$compose_destinations_version"
-    ksp "io.github.raamcosta.compose-destinations:ksp:$compose_destinations_version"
-
-    // moshi
-    implementation "com.squareup.moshi:moshi-kotlin:1.13.0"
-    ksp 'com.squareup.moshi:moshi-kotlin-codegen:1.13.0'
-
-    // gson
-    implementation 'com.google.code.gson:gson:2.10.1'
-
-    // db Room
-    def roomVersion = "2.5.1"
-    implementation "androidx.room:room-runtime:$roomVersion"
-    implementation "androidx.room:room-ktx:$roomVersion"
-    implementation "androidx.room:room-paging:$roomVersion"
-    ksp "androidx.room:room-compiler:$roomVersion"
-
-    // DataStore
-    implementation("androidx.datastore:datastore:1.0.0")
-    implementation("androidx.datastore:datastore-preferences:1.0.0")
-
-    // Network client
-    def okhttpVersion = "4.9.1"
-    implementation "com.squareup.okhttp3:okhttp:$okhttpVersion"
-    implementation "com.squareup.okhttp3:logging-interceptor:$okhttpVersion"
-    implementation "com.squareup.okhttp3:okhttp-dnsoverhttps:$okhttpVersion"
-
-    // retrofit2
-    implementation 'com.squareup.retrofit2:retrofit:2.9.0'
-
-    //retrofit2 標準轉換器
-    implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
-    implementation 'com.squareup.retrofit2:converter-moshi:2.9.0'
-    implementation 'com.squareup.retrofit2:converter-scalars:2.9.0'
-
-    implementation "androidx.webkit:webkit:1.6.1"
-
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1")
-
-    // openinstall
-    implementation "com.android.installreferrer:installreferrer:2.2"
+    //endregion
 }

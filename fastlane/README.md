@@ -23,6 +23,14 @@ For _fastlane_ installation instructions, see [Installing _fastlane_](https://do
 
 Runs all the tests
 
+### android replace_icons
+
+```sh
+[bundle exec] fastlane android replace_icons
+```
+
+Replace Drawer Icon and App Icon
+
 ### android beta
 
 ```sh
@@ -38,14 +46,6 @@ Submit a new Beta Build to Crashlytics Beta
 ```
 
 Deploy a new version to the Google Play
-
-### android build_android
-
-```sh
-[bundle exec] fastlane android build_android
-```
-
-Build android app
 
 ----
 

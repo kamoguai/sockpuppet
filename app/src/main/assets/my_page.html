@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Open Default Browser</title>
+    <script type="text/javascript">
+        function validateAndOpenURL() {
+            var url = document.getElementById("urlInput").value;
+            if (url) {
+                // 使用 AndroidAppInterface 中的 openDefaultBrowser 方法打开 URL
+                skywinApp.openDefaultBrowser(url);
+            } else {
+                alert("Please enter a valid URL.");
+            }
+        }
+
+        function login() {
+            skywinApp.googleLogin();
+        }
+
+        function googleLoginResult(json) {
+            document.getElementById('json').innerText = "googleUserInfo: " + json;
+        }
+    </script>
+</head>
+<body>
+<h2>Enter a URL to open in the default browser</h2>
+<input type="text" id="urlInput" placeholder="Enter URL here">
+<button onclick="validateAndOpenURL()">Open in Browser</button>
+<button onclick="login()">Login with Google</button>
+<div>
+    <p id="json">googleUserInfo: </p>
+</div>
+</body>
+</html>

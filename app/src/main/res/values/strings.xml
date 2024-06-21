@@ -1,3 +1,4 @@
 <resources>
-    <string name="app_name">TemplateWeb</string>
+    <string name="app_name">$appName</string>
+    <string name="default_web_client_id">"788439560266-hh2qfrg0j99atovbkc6nmq41b2pgjf0a.apps.googleusercontent.com"</string>
 </resources>

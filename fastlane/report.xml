@@ -5,12 +5,42 @@
     
     
       
-      <testcase classname="fastlane.lanes" name="0: default_platform" time="0.000197">
+      <testcase classname="fastlane.lanes" name="0: default_platform" time="0.000209">
         
       </testcase>
     
       
-      <testcase classname="fastlane.lanes" name="1: replaceLauncher" time="0.837846">
+      <testcase classname="fastlane.lanes" name="1: cp /Users/kamoguai/Desktop/馬甲文件/image/drwable/startup_logo.png ../app/src/main/res/drawable/startup_logo.png" time="0.01113">
+        
+      </testcase>
+    
+      
+      <testcase classname="fastlane.lanes" name="2: cp /Users/kamoguai/Desktop/馬甲文件/image/icon/mdpi/ic_launcher.png ../app/src/main/res/mipmap-mdpi/launcher_icon.png" time="0.006775">
+        
+      </testcase>
+    
+      
+      <testcase classname="fastlane.lanes" name="3: cp /Users/kamoguai/Desktop/馬甲文件/image/icon/hdpi/ic_launcher.png ../app/src/main/res/mipmap-hdpi/launcher_icon.png" time="0.006544">
+        
+      </testcase>
+    
+      
+      <testcase classname="fastlane.lanes" name="4: cp /Users/kamoguai/Desktop/馬甲文件/image/icon/xhdpi/ic_launcher.png ../app/src/main/res/mipmap-xhdpi/launcher_icon.png" time="0.007265">
+        
+      </testcase>
+    
+      
+      <testcase classname="fastlane.lanes" name="5: cp /Users/kamoguai/Desktop/馬甲文件/image/icon/xxhdpi/ic_launcher.png ../app/src/main/res/mipmap-xxhdpi/launcher_icon.png" time="0.007631">
+        
+      </testcase>
+    
+      
+      <testcase classname="fastlane.lanes" name="6: cp /Users/kamoguai/Desktop/馬甲文件/image/icon/xxxhdpi/ic_launcher.png ../app/src/main/res/mipmap-xxxhdpi/launcher_icon.png" time="0.007061">
+        
+      </testcase>
+    
+      
+      <testcase classname="fastlane.lanes" name="7: test" time="2.455306">
         
       </testcase>
     
